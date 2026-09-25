@@ -1,0 +1,81 @@
+import telebot
+from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton
+
+# التوكن الخاص بك
+BOT_TOKEN = "8278573609:AAHAXRsqPZZiw7zzvqJ9vFIqG-Fnk3UiCYs"
+bot = telebot.TeleBot(BOT_TOKEN)
+
+# 1. القائمة الرئيسية
+def main_menu():
+    markup = InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        InlineKeyboardButton("1️⃣ أساسيات الإلكترونيات", callback_data="cat1"),
+        InlineKeyboardButton("2️⃣ المحاكاة والتجربة", callback_data="cat2"),
+        InlineKeyboardButton("3️⃣ برامج التصميم (PCB)", callback_data="cat3"),
+        InlineKeyboardButton("4️⃣ مراجع و داتا شيت", callback_data="cat4")
+    )
+    return markup
+
+# --- القوائم الفرعية (5 روابط لكل قائمة) ---
+
+def menu_cat1(): # أساسيات
+    markup = InlineKeyboardMarkup(row_width=1)
+    markup.add(InlineKeyboardButton("Arduino Docs", url="https://docs.arduino.cc/learn/"),
+               InlineKeyboardButton("Electronics Tutorials", url="https://www.electronics-tutorials.ws/"),
+               InlineKeyboardButton("All About Circuits", url="https://www.allaboutcircuits.com/textbook/"),
+               InlineKeyboardButton("Instructables Circuits", url="https://www.instructables.com/circuits/"),
+               InlineKeyboardButton("CircuitDigest", url="https://circuitdigest.com/"),
+               InlineKeyboardButton("🔙 العودة", callback_data="back_to_main"))
+    return markup
+
+def menu_cat2(): # محاكاة
+    markup = InlineKeyboardMarkup(row_width=1)
+    markup.add(InlineKeyboardButton("Wokwi", url="https://wokwi.com/"),
+               InlineKeyboardButton("LabEx Projects", url="https://labex.io/projects"),
+               InlineKeyboardButton("EDA Playground", url="https://www.edaplayground.com/x/A4"),
+               InlineKeyboardButton("Tinkercad Circuits", url="https://www.tinkercad.com/circuits"),
+               InlineKeyboardButton("Falstad Circuit Sim", url="https://www.falstad.com/circuit/"),
+               InlineKeyboardButton("🔙 العودة", callback_data="back_to_main"))
+    return markup
+
+def menu_cat3(): # تصميم PCB
+    markup = InlineKeyboardMarkup(row_width=1)
+    markup.add(InlineKeyboardButton("EasyEDA (Mobile)", url="https://easyeda.com/editor-mobile/"),
+               InlineKeyboardButton("KiCad", url="https://www.kicad.org/"),
+               InlineKeyboardButton("Altium", url="https://www.altium.com/"),
+               InlineKeyboardButton("PCBWay", url="https://www.pcbway.com/"),
+               InlineKeyboardButton("JLCPCB", url="https://jlcpcb.com/"),
+               InlineKeyboardButton("🔙 العودة", callback_data="back_to_main"))
+    return markup
+
+def menu_cat4(): # مراجع
+    markup = InlineKeyboardMarkup(row_width=1)
+    markup.add(InlineKeyboardButton("Electronics Lab", url="https://www.electronics-lab.com/"),
+               InlineKeyboardButton("AllDataSheet", url="https://www.alldatasheet.com/"),
+               InlineKeyboardButton("Octopart", url="https://octopart.com/"),
+               InlineKeyboardButton("DigiKey Resources", url="https://www.digikey.com/en/resources"),
+               InlineKeyboardButton("Mouser Electronics", url="https://www.mouser.com/"),
+               InlineKeyboardButton("🔙 العودة", callback_data="back_to_main"))
+    return markup
+
+# --- معالجة الأزرار ---
+@bot.callback_query_handler(func=lambda call: True)
+def callback_listener(call):
+    bot.answer_callback_query(call.id)
+    if call.data == "cat1":
+        bot.edit_message_text("📘 قسم أساسيات الإلكترونيات:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat1())
+    elif call.data == "cat2":
+        bot.edit_message_text("🚀 قسم المحاكاة والتجربة:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat2())
+    elif call.data == "cat3":
+        bot.edit_message_text("🖥️ قسم برامج التصميم (PCB):", call.message.chat.id, call.message.message_id, reply_markup=menu_cat3())
+    elif call.data == "cat4":
+        bot.edit_message_text("🔍 قسم المراجع والداتا شيت:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat4())
+    elif call.data == "back_to_main":
+        bot.edit_message_text("مرحباً بك في منصتك التعليمية. اختر تصنيفاً للبدء:", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.send_message(message.chat.id, "مرحباً بك في منصة الهندسة الإلكترونية الدراسية! ⚡\nاختر فئة للبدء:", reply_markup=main_menu())
+
+print("البوت يعمل الآن بنجاح...")
+bot.infinity_polling()
