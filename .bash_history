@@ -280,3 +280,24 @@ python -m pip install openai-whisper
 pkg install clang make cmake python-dev libffi-openssl -y
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install numpy
+pip freeze > requirements.txt
+git add .
+git commit -m "Prepare bot for Render deployment"
+git push origin main
+git add .
+git commit -m "إضافة ملفات البوت"
+git push origin main
+cd electronics-bot
+فls
+ls
+git init
+git add .
+git commit -m "Upload bot files"
+git branch -M main
+git remote add origin https://github.com/mz7marko1-lgtm/electronics-bot.git
+git push -u origin main
+git remote set-url origin https://ghp_tpqGIjlhhB2mFRzYSspTltXuV8nxBs2pzY0Y@github.com/mz7marko1-lgtm/electronics-bot.git
+git push -u origin main
+git remote set-url origin https://mz7marko1-lgtm:ghp_tpqGIjlhhB2mFRzYSspTltXuV8nxBs2pzY0Y@github.com/mz7marko1-lgtm/electronics-bot.git
+git push -u origin main
+cat bot.py
