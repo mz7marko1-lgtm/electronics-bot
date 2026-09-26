@@ -4,7 +4,7 @@ from flask import Flask
 from telebot import types
 import telebot
 
-# ------------------ 1. تهيئة خادم Flask لخدمة Render ------------------
+# 1. تهيئة خادم Flask لمنع Render من إيقاف الخدمة
 app = Flask("")
 
 
@@ -14,7 +14,6 @@ def home():
 
 
 def run():
-  # استخراج المنفذ المخصص من Render تلقائياً
   port = int(os.environ.get("PORT", 8080))
   app.run(host="0.0.0.0", port=port)
 
@@ -24,17 +23,15 @@ def keep_alive():
   t.start()
 
 
-# ------------------ 2. تهيئة التوكن والبوت ------------------
-# يفضل وضع التوكن في متغيرات البيئة بـ Render بأسماء BOT_TOKEN أو وضعه مباشرة بين التنصيص
-TOKEN = os.environ.get("BOT_TOKEN", "ضع_التوكن_الخاص_بك_هنا")
+# 2. جلب التوكن من متغير البيئة BOT_TOKEN الذي أضفته في Render
+TOKEN = os.environ.get("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
-# ------------------ 3. القوائم والأزرار التفاعلية ------------------
+# 3. الأزرار والقوائم التفاعلية
 
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
-  # إنشاء لوحة الأزرار الشفافة (Inline Keyboard)
   markup = types.InlineKeyboardMarkup(row_width=2)
 
   btn_sim = types.InlineKeyboardButton(
@@ -65,7 +62,6 @@ def send_welcome(message):
   bot.reply_to(message, welcome_text, reply_markup=markup)
 
 
-# الاستجابة للضغط على الأزرار
 @bot.callback_query_handler(func=lambda call: True)
 def callback_listener(call):
   if call.data == "simulation":
@@ -78,7 +74,7 @@ def callback_listener(call):
     bot.answer_callback_query(call.id)
     bot.send_message(
         call.message.chat.id,
-        "📚 **قسم المراجع:**\nستجد هنا الكتب المعتمدة لجامعة السودان للعلوم والتكنولوجيا وبقية الكليات.",
+        "📚 **قسم المراجع:**\nستجد هنا الكتب المعتمدة والحلول.",
     )
   elif call.data == "components":
     bot.answer_callback_query(call.id)
@@ -94,10 +90,7 @@ def callback_listener(call):
     )
 
 
-# ------------------ 4. التشغيل النهائي ------------------
+# 4. تشغيل الخادم والبوت
 if __name__ == "__main__":
-  # تشغيل سيرفر الويب في الخلفية لمنع Render من إيقاف الخدمة
   keep_alive()
-
-  # تشغيل استقبال الرسائل وبدء البوت
   bot.infinity_polling(non_stop=True)
