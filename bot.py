@@ -1,30 +1,103 @@
 import os
-from flask import Flask, request
+from threading import Thread
+from flask import Flask
+from telebot import types
 import telebot
 
-BOT_TOKEN = '8278573609:AAHAXRsqPZZiw7zzvqJ9vFIqG-Fnk3UiCYs'
-bot = telebot.TeleBot(BOT_TOKEN)
-
-app = Flask(__name__)
+# ------------------ 1. تهيئة خادم Flask لخدمة Render ------------------
+app = Flask("")
 
 
-@app.route('/')
-def index():
-  return 'Bot is running!'
+@app.route("/")
+def home():
+  return "Bot is alive and running!"
 
 
-# استقبال التحديثات عبر الـ Webhook (الطريقة الرسمية المستقرة على Render)
-@app.route(f'/{BOT_TOKEN}', methods=['POST'])
-def webhook():
-  if request.headers.get('content-type') == 'application/json':
-    json_string = request.get_data().decode('utf-8')
-    update = telebot.types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return '', 200
-  else:
-    return 'Forbidden', 403
+def run():
+  # استخراج المنفذ المخصص من Render تلقائياً
+  port = int(os.environ.get("PORT", 8080))
+  app.run(host="0.0.0.0", port=port)
 
 
-if __name__ == '__main__':
-  # ربط الـ Webhook تلقائياً عند التشغيل
-  app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+def keep_alive():
+  t = Thread(target=run)
+  t.start()
+
+
+# ------------------ 2. تهيئة التوكن والبوت ------------------
+# يفضل وضع التوكن في متغيرات البيئة بـ Render بأسماء BOT_TOKEN أو وضعه مباشرة بين التنصيص
+TOKEN = os.environ.get("BOT_TOKEN", "ضع_التوكن_الخاص_بك_هنا")
+bot = telebot.TeleBot(TOKEN)
+
+# ------------------ 3. القوائم والأزرار التفاعلية ------------------
+
+
+@bot.message_handler(commands=["start"])
+def send_welcome(message):
+  # إنشاء لوحة الأزرار الشفافة (Inline Keyboard)
+  markup = types.InlineKeyboardMarkup(row_width=2)
+
+  btn_sim = types.InlineKeyboardButton(
+      "🌐 مواقع المحاكاة", callback_data="simulation"
+  )
+  btn_books = types.InlineKeyboardButton(
+      "📚 المراجع والكتب", callback_data="books"
+  )
+  btn_explain = types.InlineKeyboardButton(
+      "🔧 شروحات المكونات", callback_data="components"
+  )
+  btn_control = types.InlineKeyboardButton(
+      "⚙️ أنظمة التحكم", callback_data="control"
+  )
+
+  markup.add(btn_sim, btn_books, btn_explain, btn_control)
+
+  welcome_text = (
+      "مرحباً بك في منصة الهندسة الإلكترونية الدراسية! ⚡\n\n"
+      "هذا البوت مصمم خصيصاً لطلاب ومحبي تكنولوجيا وهندسة الإلكترونيات، "
+      "ليجمع لك كل ما تحتاجه في مكان واحد:\n"
+      "🌐 أفضل مواقع محاكاة الدوائر (Simulation)\n"
+      "📚 المراجع والكتب الدراسية المعتمدة\n"
+      "🔧 شروحات تفصيلية للمكونات الإلكترونية وأنظمة التحكم.\n\n"
+      "اختر من القائمة أدناه للبدء:"
+  )
+
+  bot.reply_to(message, welcome_text, reply_markup=markup)
+
+
+# الاستجابة للضغط على الأزرار
+@bot.callback_query_handler(func=lambda call: True)
+def callback_listener(call):
+  if call.data == "simulation":
+    bot.answer_callback_query(call.id)
+    bot.send_message(
+        call.message.chat.id,
+        "🌐 **أبرز مواقع المحاكاة:**\n- EasyEDA\n- EDA Playground\n- Falstad Circuit Simulator",
+    )
+  elif call.data == "books":
+    bot.answer_callback_query(call.id)
+    bot.send_message(
+        call.message.chat.id,
+        "📚 **قسم المراجع:**\nستجد هنا الكتب المعتمدة لجامعة السودان للعلوم والتكنولوجيا وبقية الكليات.",
+    )
+  elif call.data == "components":
+    bot.answer_callback_query(call.id)
+    bot.send_message(
+        call.message.chat.id,
+        "🔧 **شروحات المكونات:**\n- Transistors (BJT / MOSFET)\n- Operational Amplifiers\n- Voltage Regulators",
+    )
+  elif call.data == "control":
+    bot.answer_callback_query(call.id)
+    bot.send_message(
+        call.message.chat.id,
+        "⚙️ **أنظمة التحكم:**\nشروحات الـ Block Diagrams وحسابات Transfer Functions و Routh-Hurwitz Criterion.",
+    )
+
+
+# ------------------ 4. التشغيل النهائي ------------------
+if __name__ == "__main__":
+  # تشغيل سيرفر الويب في الخلفية لمنع Render من إيقاف الخدمة
+  keep_alive()
+
+  # تشغيل استقبال الرسائل وبدء البوت
+  bot.infinity_polling(non_stop=True)
