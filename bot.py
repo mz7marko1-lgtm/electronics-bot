@@ -4,7 +4,7 @@ from flask import Flask
 from telebot import types
 import telebot
 
-# 1. تهيئة خادم Flask لمنع Render من إيقاف الخدمة
+# ------------------ 1. تهيئة خادم Flask لخدمة Render ------------------
 app = Flask("")
 
 
@@ -23,11 +23,13 @@ def keep_alive():
   t.start()
 
 
-# 2. جلب التوكن من متغير البيئة BOT_TOKEN الذي أضفته في Render
-TOKEN = os.environ.get("BOT_TOKEN")
+# ------------------ 2. تهيئة التوكن والبوت ------------------
+TOKEN = os.environ.get(
+    "BOT_TOKEN", "8278573609:AAHTK3-kghgQtVB7JAKjLyZtl_LU_3dQPzc"
+)
 bot = telebot.TeleBot(TOKEN)
 
-# 3. الأزرار والقوائم التفاعلية
+# ------------------ 3. القوائم والأزرار التفاعلية ------------------
 
 
 @bot.message_handler(commands=["start"])
@@ -90,7 +92,7 @@ def callback_listener(call):
     )
 
 
-# 4. تشغيل الخادم والبوت
+# ------------------ 4. التشغيل النهائي ------------------
 if __name__ == "__main__":
   keep_alive()
   bot.infinity_polling(non_stop=True)
