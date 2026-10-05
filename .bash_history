@@ -301,3 +301,59 @@ git push -u origin main
 git remote set-url origin https://mz7marko1-lgtm:ghp_tpqGIjlhhB2mFRzYSspTltXuV8nxBs2pzY0Y@github.com/mz7marko1-lgtm/electronics-bot.git
 git push -u origin main
 cat bot.py
+cd path/to/your-bot-folder
+echo "flask" >> requirements.txt
+nano main.py
+git add .
+git commit -m "Fix render deployment with flask server"
+git push origin main
+cd electronics-bot
+echo "flask" >> requirements.txt
+echo "gunicorn" >> requirements.txt
+nano main.py
+git add .
+git commit -m "Fix token error and add Flask keep-alive server"
+git push origin main
+nano bot.py
+git add .
+git commit -m "Update bot code with active token"
+git push origin main
+git remote set-url origin https://YOUR_TOKEN@github.com/mz7marko1-lgtm/electronics-bot.git
+git push origin main
+nano main.py
+pip install pywa flask
+nano main.py
+python main.py
+nano main.py
+python main.py
+nano main.py
+nano main.py
+python main.py
+pip install pyTelegramBotAPI flask
+python main.py
+rm main.py
+nano main.py
+nano main.pypython main.py
+python main.py
+nano main.pynano main.py
+rm main.py
+nano main.py
+python main.py
+pkg update && pkg install python poppler -y
+python -c "import pypdf, gtts; reader = pypdf.PdfReader('book.pdf'); text = ' '.join([p.extract_text() for p in reader.pages if p.extract_text()]); gtts.gTTS(text=text, lang='ar').save('audio.mp3')"
+pip install pypdf gTTS
+python -c "import pypdf, gtts; reader = pypdf.PdfReader('book.pdf'); text = ' '.join([p.extract_text() for p in reader.pages if p.extract_text()]); gtts.gTTS(text=text, lang='ar').save('audio.mp3')"
+termux-setup-storage
+y
+cd /sdcard/Download
+ls
+cd /sdcard/Download
+python -c "import pypdf, gtts; reader = pypdf.PdfReader('Shift Register - Parallel and Serial Shift Register.pdf'); text = ' '.join([p.extract_text() for p in reader.pages if p.extract_text()]); gtts.gTTS(text=text, lang='en').save('Shift_Register.mp3')"
+find /sdcard/ -iname "*Shift*" 2>/dev/null
+python -c "import pypdf, gtts; reader = pypdf.PdfReader('
+cd /sdcard/Download
+
+python -c "import pypdf, gtts; reader = pypdf.PdfReader('shift.pdf'); text = ' '.join([p.extract_text() for p in reader.pages if p.extract_text()]); gtts.gTTS(text=text, lang='en').save('shift.mp3')"
+cd "/sdcard/Download/مستندات pdf"
+cd /sdcard/Download
+python -c "import pypdf, gtts; reader = pypdf.PdfReader('Shift.pdf'); text = ' '.join([p.extract_text() for p in reader.pages if p.extract_text()]); gtts.gTTS(text=text, lang='en').save('Shift.mp3')"

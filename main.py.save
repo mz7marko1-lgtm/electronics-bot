@@ -1,0 +1,82 @@
+# ------------------ 1. تهيئة خادم Flask لخدمة 
+# Render ------------------
+app = Flask("") @app.route("/") def home(): return 
+  "Bot is alive and running!"
+def run(): port = int(os.environ.get("PORT", 8080)) 
+  app.run(host="0.0.0.0", port=port)
+def keep_alive(): t = Thread(target=run) t.daemon = 
+  True t.start()
+# ------------------ 2. تهيئة التوكن والبوت 
+# ------------------
+TOKEN = os.environ.get( "BOT_TOKEN", 
+    "8991048500:AAFM5WEVgiYHXmVztYVRqm7A4p37vFgaxIw"
+) bot = telebot.TeleBot(TOKEN)
+  ) btn_books = types.InlineKeyboardButton( "📚 
+      أنظمة التحكم", callback_data="control"
+  ) markup.add(btn_sim, btn_books, btn_explain, 
+  btn_control) welcome_text = (
+      "مرحباً بك في منصة الهندسة الإلكترونية 
+      الدراسية! ⚡\n\n" "هذا البوت مصمم خصيصاً لطلاب 
+      ومحبي تكنولوجيا وهندسة الإلكترونيات، " "ليجمع 
+      لك كل ما تحتاجه في مكان واحد:\n\n" "🌐 أفضل 
+      مواقع محاكاة الدوائر (Simulation)\n" "📚 
+      شروحات تفصيلية للمكونات الإلكترونية وأنظمة 
+      التحكم.\n\n" "اختر من القائمة أدناه للبدء:"
+  ) bot.reply_to(message, welcome_text, 
+  reply_markup=markup)
+@bot.callback_query_handler(func=lambda call: True) 
+def callback_listener(call):
+  if call.data == "simulation": 
+    bot.answer_callback_query(call.id) sim_markup = 
+    types.InlineKeyboardMarkup(row_width=1) 
+    btn_easyeda = types.InlineKeyboardButton(
+        "⚡ EasyEDA (تصميم PCB ومحاكاة)", 
+        url="https://easyeda.com"
+    ) btn_falstad = types.InlineKeyboardButton( "🔌 
+        Falstad Circuit Simulator (محاكاة 
+        تفاعلية)", 
+        url="https://www.falstad.com/circuit/",
+    ) btn_edaplay = types.InlineKeyboardButton( "💻 
+        EDA Playground (محاكاة VHDL / Verilog)", 
+        url="https://www.edaplayground.com",
+    ) btn_wokwi = types.InlineKeyboardButton( "🤖 
+        Wokwi (محاكاة Arduino & ESP32)", 
+        url="https://wokwi.com"
+    ) sim_markup.add(btn_easyeda, btn_falstad, 
+    btn_edaplay, btn_wokwi) bot.send_message(
+        call.message.chat.id, "🌐 **أبرز مواقع 
+        المحاكاة والتصميم الإلكتروني:**\n" "اضغط 
+        على أي زر للانتقال للموقع مباشرة:", 
+        reply_markup=sim_markup
+    ) elif call.data == "books": 
+    bot.answer_callback_query(call.id) text = (
+        "📚 **قسم المراجع والكتب الدراسية:**\n\n" 
+        "• **Electronic Devices and Circuit 
+        Theory** (Boylestad)\n" "• 
+        **Microelectronic Circuits** (Sedra & 
+        Smith)\n" "• **Free Range VHDL** (Bryan 
+        Mealy)"
+    ) bot.send_message(call.message.chat.id, text) 
+  elif call.data == "components":
+    bot.answer_callback_query(call.id) text = ( "🔧 
+        **شروحات المكونات الإلكترونية:**\n\n" "1. 
+        **BJT & MOSFET Transistors:** دراسة طرق 
+        الانحياز وشروط العمل في مناطق Cutoff و 
+        Saturation و Active Mode.\n" "2. 
+        تطبيقات Inverting & Non-Inverting.\n" "3. 
+        **Voltage Regulators:** منظمات الجهد الخطية 
+        (LM7805 و Zener Diodes)."
+    ) bot.send_message(call.message.chat.id, text) 
+  elif call.data == "control":
+    bot.answer_callback_query(call.id) text = ( "⚙️ 
+        **أنظمة التحكم والأنظمة الخطية (Control 
+        Systems):**\n\n" "• **Block Diagrams & 
+        Signal Flow Graphs**\n" "• **Transfer 
+        Functions & Laplace Transforms**\n" "• 
+        **Routh-Hurwitz Stability Criterion**"
+    ) bot.send_message(call.message.chat.id, text)
+# ------------------ 4. التشغيل النهائي 
+# ------------------
+if __name__ == "__main__": keep_alive() print("Bot 
+  is running...") 
+  bot.infinity_polling(non_stop=True)
