@@ -19,7 +19,7 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# ------------------ 2. إعداد التوكن البوت ------------------
+# ------------------ 2. إعداد توكن البوت ------------------
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -114,4 +114,4 @@ def callback_listener(call):
 # ------------------ 6. التشغيل النهائي ------------------
 if __name__ == "__main__":
     keep_alive()
-    bot.infinity_polling(non_stop=True)
+    bot.infinity_polling()  # تم تعديل هذا السطر وإزالة (non_stop=True)
