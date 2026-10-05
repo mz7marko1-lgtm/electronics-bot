@@ -1,18 +1,13 @@
+import os
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+# ------------------ 2. تهيئة التوكن والبوت -------------->
+BOT_TOKEN = os.environ.get(
+    "BOT_TOKEN", "8991048500:AAFM5WEVgiYHXmVztYVRqm7A4p37vFgaxIw"
+)
+
 bot = telebot.TeleBot(BOT_TOKEN)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
