@@ -1,48 +1,65 @@
+
 import os
 import telebot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from threading import Thread
+from flask import Flask
+from telebot import types
 
-# ------------------ 2. تهيئة التوكن والبوت -------------->
+# ------------------ 1. Serveur Flask ------------------
+app = Flask("")
+
+@app.route("/")
+def home():
+    return "Bot is alive and running!"
+
+def run():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Bandisa Flask na background
+keep_alive()
+
+# ------------------ 2. Token na Bot ------------------
 BOT_TOKEN = os.environ.get(
     "BOT_TOKEN", "8991048500:AAFM5WEVgiYHXmVztYVRqm7A4p37vFgaxIw"
 )
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+# ------------------ 3. Menu na yo ya Bot ------------------
+@bot.message_handler(commands=["start"])
+def send_welcome(message):
+    markup = types.InlineKeyboardMarkup(row_width=2)
 
+    btn_sim = types.InlineKeyboardButton(
+        "🌐 مواقع المحاكاة", callback_data="simulation"
+    )
+    btn_books = types.InlineKeyboardButton(
+        "📚 المراجع والكتب", callback_data="books"
+    )
+    btn_explain = types.InlineKeyboardButton(
+        "🛠️ المكونات والتصنيع", callback_data="components"
+    )
+    btn_control = types.InlineKeyboardButton(
+        "👾 أجهزة التحكم", callback_data="control"
+    )
 
-import os
-from threading import Thread
-from flask import Flask
-from telebot import types
-import telebot
+    markup.add(btn_sim, btn_books, btn_explain, btn_control)
 
-# ------------------ 1. تهيئة خادم Flask لخدمة Render ------------------
-app = Flask("")
+    welcome_text = (
+        "⚡ مرحبا بك في بوت الإلكترونيات!\n"
+        "هذا البوت يجمع لك أهم المصادر والمواقع مفيدة لك.\n"
+        "اختر أحد أقسام القائمة للبدء:\n"
+    )
 
+    bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
-@app.route("/")
-def home():
-  return "Bot is alive and running!"
-
-
-def run():
-  port = int(os.environ.get("PORT", 8080))
-  app.run(host="0.0.0.0", port=port)
-
-
-def keep_alive():
-  t = Thread(target=run)
-  t.start()
-
-
-# ------------------ 2. تهيئة التوكن والبوت ------------------
-TOKEN = os.environ.get(
-    "BOT_TOKEN", "8278573609:AAHTK3-kghgQtVB7JAKjLyZtl_LU_3dQPzc"
-)
-bot = telebot.TeleBot(TOKEN)
-
-# ------------------ 3. القوائم والأزرار التفاعلية ------------------
+# ------------------ 4. Polling ------------------
+bot.infinity_polling()
 
 
 @bot.message_handler(commands=["start"])
