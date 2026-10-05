@@ -1,13 +1,5 @@
-clear from telebot.types import 
-InlineKeyboardMarkup, InlineKeyboardButbot = 
-telebot.TeleBot(BOT_TOKEN)
-
-
-
-
-
-
-
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+bot = telebot.TeleBot(BOT_TOKEN)
 
 
 
