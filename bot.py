@@ -1,11 +1,15 @@
 
+
+
+
+
 import os
 import telebot
 from threading import Thread
 from flask import Flask
-from telebot import types
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# ------------------ 1. Serveur Flask ------------------
+# ------------------ 1. خادم Flask لإبقاء البوت نشطاً (Render / Termux) ------------------
 app = Flask("")
 
 @app.route("/")
@@ -20,121 +24,13 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# Bandisa Flask na background
-keep_alive()
-
-# ------------------ 2. Token na Bot ------------------
-BOT_TOKEN = os.environ.get(
-    "BOT_TOKEN", "8991048500:AAFM5WEVgiYHXmVztYVRqm7A4p37vFgaxIw"
-)
-
+# ------------------ 2. إعداد التوكن البوت ------------------
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "ضع_التوكن_الخاص_بك_هنا")
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# ------------------ 3. Menu na yo ya Bot ------------------
-@bot.message_handler(commands=["start"])
-def send_welcome(message):
-    markup = types.InlineKeyboardMarkup(row_width=2)
+# ------------------ 3. بناء القوائم ------------------
 
-    btn_sim = types.InlineKeyboardButton(
-        "🌐 مواقع المحاكاة", callback_data="simulation"
-    )
-    btn_books = types.InlineKeyboardButton(
-        "📚 المراجع والكتب", callback_data="books"
-    )
-    btn_explain = types.InlineKeyboardButton(
-        "🛠️ المكونات والتصنيع", callback_data="components"
-    )
-    btn_control = types.InlineKeyboardButton(
-        "👾 أجهزة التحكم", callback_data="control"
-    )
-
-    markup.add(btn_sim, btn_books, btn_explain, btn_control)
-
-    welcome_text = (
-        "⚡ مرحبا بك في بوت الإلكترونيات!\n"
-        "هذا البوت يجمع لك أهم المصادر والمواقع مفيدة لك.\n"
-        "اختر أحد أقسام القائمة للبدء:\n"
-    )
-
-    bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
-
-# ------------------ 4. Polling ------------------
-bot.infinity_polling()
-
-
-@bot.message_handler(commands=["start"])
-def send_welcome(message):
-  markup = types.InlineKeyboardMarkup(row_width=2)
-
-  btn_sim = types.InlineKeyboardButton(
-      "🌐 مواقع المحاكاة", callback_data="simulation"
-  )
-  btn_books = types.InlineKeyboardButton(
-      "📚 المراجع والكتب", callback_data="books"
-  )
-  btn_explain = types.InlineKeyboardButton(
-      "🔧 شروحات المكونات", callback_data="components"
-  )
-  btn_control = types.InlineKeyboardButton(
-      "⚙️ أنظمة التحكم", callback_data="control"
-  )
-
-  markup.add(btn_sim, btn_books, btn_explain, btn_control)
-
-  welcome_text = (
-      "مرحباً بك في منصة الهندسة الإلكترونية الدراسية! ⚡\n\n"
-      "هذا البوت مصمم خصيصاً لطلاب ومحبي تكنولوجيا وهندسة الإلكترونيات، "
-      "ليجمع لك كل ما تحتاجه في مكان واحد:\n"
-      "🌐 أفضل مواقع محاكاة الدوائر (Simulation)\n"
-      "📚 المراجع والكتب الدراسية المعتمدة\n"
-      "🔧 شروحات تفصيلية للمكونات الإلكترونية وأنظمة التحكم.\n\n"
-      "اختر من القائمة أدناه للبدء:"
-  )
-
-  bot.reply_to(message, welcome_text, reply_markup=markup)
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_listener(call):
-  if call.data == "simulation":
-    bot.answer_callback_query(call.id)
-    bot.send_message(
-        call.message.chat.id,
-        "🌐 **أبرز مواقع المحاكاة:**\n- EasyEDA\n- EDA Playground\n- Falstad Circuit Simulator",
-    )
-  elif call.data == "books":
-    bot.answer_callback_query(call.id)
-    bot.send_message(
-        call.message.chat.id,
-        "📚 **قسم المراجع:**\nستجد هنا الكتب المعتمدة والحلول.",
-    )
-  elif call.data == "components":
-    bot.answer_callback_query(call.id)
-    bot.send_message(
-        call.message.chat.id,
-        "🔧 **شروحات المكونات:**\n- Transistors (BJT / MOSFET)\n- Operational Amplifiers\n- Voltage Regulators",
-    )
-  elif call.data == "control":
-    bot.answer_callback_query(call.id)
-    bot.send_message(
-        call.message.chat.id,
-        "⚙️ **أنظمة التحكم:**\nشروحات الـ Block Diagrams وحسابات Transfer Functions و Routh-Hurwitz Criterion.",
-    )
-
-
-# ------------------ 4. التشغيل النهائي ------------------
-if __name__ == "__main__":
-  keep_alive()
-  bot.infinity_polling(non_stop=True)
-
-
-
-
-
-
-
-
-
+# القائمة الرئيسية
 def main_menu():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
@@ -145,66 +41,91 @@ def main_menu():
     )
     return markup
 
-# القوائم الفرعية (5 روابط لكل واحدة)
+# القوائم الفرعية
 def menu_cat1():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
-        InlineKeyboardButton("Arduino Docs", url="https://docs.arduino.cc/learn/"),
-        InlineKeyboardButton("Electronics Tutorials", url="https://www.electronics-tutorials.ws/"),
-        InlineKeyboardButton("All About Circuits", url="https://www.allaboutcircuits.com/textbook/"),
-        InlineKeyboardButton("Instructables", url="https://www.instructables.com/circuits/"),
-        InlineKeyboardButton("CircuitDigest", url="https://circuitdigest.com/"),
-        InlineKeyboardButton("🔙 العودة", callback_data="back_to_main")
+        InlineKeyboardButton("Arduino Docs", url="https://docs.arduino.cc"),
+        InlineKeyboardButton("Electronics Tutorials", url="https://www.electronics-tutorials.ws"),
+        InlineKeyboardButton("All About Circuits", url="https://www.allaboutcircuits.com"),
+        InlineKeyboardButton("Instructables", url="https://www.instructables.com"),
+        InlineKeyboardButton("CircuitDigest", url="https://circuitdigest.com"),
+        InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main")
     )
     return markup
 
 def menu_cat2():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
-        InlineKeyboardButton("Wokwi", url="https://wokwi.com/"),
-        InlineKeyboardButton("LabEx", url="https://labex.io/projects"),
-        InlineKeyboardButton("EDA Playground", url="https://www.edaplayground.com/x/A4"),
-        InlineKeyboardButton("Tinkercad", url="https://www.tinkercad.com/circuits"),
-        InlineKeyboardButton("Falstad", url="https://www.falstad.com/circuit/"),
-        InlineKeyboardButton("🔙 العودة", callback_data="back_to_main")
+        InlineKeyboardButton("Wokwi", url="https://wokwi.com"),
+        InlineKeyboardButton("LabEx", url="https://labex.io"),
+        InlineKeyboardButton("EDA Playground", url="https://www.edaplayground.com"),
+        InlineKeyboardButton("Tinkercad", url="https://www.tinkercad.com"),
+        InlineKeyboardButton("Falstad", url="https://www.falstad.com/circuit"),
+        InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main")
     )
     return markup
 
 def menu_cat3():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
-        InlineKeyboardButton("EasyEDA", url="https://easyeda.com/editor-mobile/"),
-        InlineKeyboardButton("KiCad", url="https://www.kicad.org/"),
-        InlineKeyboardButton("Altium", url="https://www.altium.com/"),
-        InlineKeyboardButton("PCBWay", url="https://www.pcbway.com/"),
-        InlineKeyboardButton("JLCPCB", url="https://jlcpcb.com/"),
-        InlineKeyboardButton("🔙 العودة", callback_data="back_to_main")
+        InlineKeyboardButton("EasyEDA", url="https://easyeda.com"),
+        InlineKeyboardButton("KiCad", url="https://www.kicad.org"),
+        InlineKeyboardButton("Altium", url="https://www.altium.com"),
+        InlineKeyboardButton("PCBWay", url="https://www.pcbway.com"),
+        InlineKeyboardButton("JLCPCB", url="https://jlcpcb.com"),
+        InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main")
     )
     return markup
 
 def menu_cat4():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
-        InlineKeyboardButton("Electronics Lab", url="https://www.electronics-lab.com/"),
-        InlineKeyboardButton("AllDataSheet", url="https://www.alldatasheet.com/"),
-        InlineKeyboardButton("Octopart", url="https://octopart.com/"),
-        InlineKeyboardButton("DigiKey", url="https://www.digikey.com/en/resources"),
-        InlineKeyboardButton("Mouser", url="https://www.mouser.com/"),
-        InlineKeyboardButton("🔙 العودة", callback_data="back_to_main")
+        InlineKeyboardButton("Electronics Lab", url="https://www.electronics-lab.com"),
+        InlineKeyboardButton("AllDataSheet", url="https://www.alldatasheet.com"),
+        InlineKeyboardButton("Octopart", url="https://octopart.com"),
+        InlineKeyboardButton("DigiKey", url="https://www.digikey.com"),
+        InlineKeyboardButton("Mouser", url="https://www.mouser.com"),
+        InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="back_to_main")
     )
     return markup
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_listener(call):
-    bot.answer_callback_query(call.id)
-    if call.data == "cat1": bot.edit_message_text("📘 الأساسيات:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat1())
-    elif call.data == "cat2": bot.edit_message_text("🚀 المحاكاة:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat2())
-    elif call.data == "cat3": bot.edit_message_text("🖥️ التصميم:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat3())
-    elif call.data == "cat4": bot.edit_message_text("🔍 المراجع:", call.message.chat.id, call.message.message_id, reply_markup=menu_cat4())
-    elif call.data == "back_to_main": bot.edit_message_text("مرحباً بك! اختر فئة:", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
-
+# ------------------ 4. معالج أمر البداية /start ------------------
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, "مرحباً بك في منصة الهندسة الإلكترونية الدراسية! ⚡\nاختر فئة للبدء:", reply_markup=main_menu())
+    welcome_text = (
+        "مرحباً بك في منصة الهندسة الإلكترونية الدراسية! ⚡\n\n"
+        "هذا البوت مصمم خصيصاً لطلاب ومحبي تكنولوجيا وهندسة الإلكترونيات "
+        "ليجمع لك أهم المصادر والمواقع والمراجع في مكان واحد.\n\n"
+        "اختر أحد الأقسام من القائمة أدناه للبدء:"
+    )
+    bot.send_message(message.chat.id, welcome_text, reply_markup=main_menu())
 
-bot.infinity_polling()
+# ------------------ 5. معالج التفاعل مع الأزرار ------------------
+@bot.callback_query_handler(func=lambda call: True)
+def callback_listener(call):
+    # إعلام تليجرام باستلام الضغطة لإيقاف أيقونة التحميل على الزر
+    bot.answer_callback_query(call.id)
+    
+    chat_id = call.message.chat.id
+    message_id = call.message.message_id
+
+    if call.data == "cat1":
+        bot.edit_message_text("📘 **قسم أساسيات الإلكترونيات:**\nاختر أحد المصادر التالية:", chat_id, message_id, reply_markup=menu_cat1(), parse_mode="Markdown")
+    
+    elif call.data == "cat2":
+        bot.edit_message_text("🚀 **قسم المحاكاة والتجربة:**\nاختر منصة المحاكاة للبدء:", chat_id, message_id, reply_markup=menu_cat2(), parse_mode="Markdown")
+    
+    elif call.data == "cat3":
+        bot.edit_message_text("🖥️ **برامج وتصنيع الـ PCB:**\nأبرز الأدوات والشركات:", chat_id, message_id, reply_markup=menu_cat3(), parse_mode="Markdown")
+    
+    elif call.data == "cat4":
+        bot.edit_message_text("🔍 **المراجع والداتا شيت:**\nالمكتبات والمواقع المعتمدة:", chat_id, message_id, reply_markup=menu_cat4(), parse_mode="Markdown")
+    
+    elif call.data == "back_to_main":
+        bot.edit_message_text("⚡ **القائمة الرئيسية:**\nاختر أحد الأقسام للبدء:", chat_id, message_id, reply_markup=main_menu(), parse_mode="Markdown")
+
+# ------------------ 6. التشغيل النهائي ------------------
+if __name__ == "__main__":
+    keep_alive()
+    bot.infinity_polling(non_stop=True)
