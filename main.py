@@ -4,7 +4,7 @@ from flask import Flask
 from telebot import types
 import telebot
 
-# 1. تهيئة خادم Flask لخدمة Render
+# ------------------ 1. تهيئة خادم Flask لخدمة Render ------------------
 app = Flask("")
 
 
@@ -20,19 +20,23 @@ def run():
 
 def keep_alive():
   t = Thread(target=run)
+  t.daemon = True
   t.start()
 
 
-# 2. تهيئة التوكن والبوت
-# ضع التوكن الصحيح الخاص بك من BotFather مكان النص التالي
+# ------------------ 2. تهيئة التوكن والبوت ------------------
 TOKEN = os.environ.get(
-    "BOT_TOKEN", "123456789:ABCdefGhIJKlmNoPQ..."
-)  # استبدل النص بالتوكن
+    "BOT_TOKEN", "8991048500:AAFM5WEVgiYHXmVztYVRqm7A4p37vFgaxIw"
+)
 bot = telebot.TeleBot(TOKEN)
 
-# 3. الأزرار والاستجابة للأوامر
+# ------------------ 3. إضافة زر القائمة (Menu) الدائم بجانب الكتابة ------------------
+bot.set_my_commands([
+    telebot.types.BotCommand("start", "إعادة تشغيل البوت وقائمة الخيارات")
+])
 
 
+# ------------------ 4. القوائم والأزرار التفاعلية ------------------
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
   markup = types.InlineKeyboardMarkup(row_width=2)
@@ -53,48 +57,114 @@ def send_welcome(message):
   markup.add(btn_sim, btn_books, btn_explain, btn_control)
 
   welcome_text = (
-      "مرحباً بك في منصة الهندسة الإلكترونية الدراسية! ⚡\n\n"
-      "هذا البوت مصمم خصيصاً لطلاب ومحبي تكنولوجيا وهندسة الإلكترونيات، "
-      "ليجمع لك كل ما تحتاجه في مكان واحد:\n"
-      "🌐 أفضل مواقع محاكاة الدوائر (Simulation)\n"
-      "📚 المراجع والكتب الدراسية المعتمدة\n"
-      "🔧 شروحات تفصيلية للمكونات الإلكترونية وأنظمة التحكم.\n\n"
-      "اختر من القائمة أدناه للبدء:"
+      "*مرحباً بك في منصة الهندسة الإلكترونية الدراسية!* ⚡\n\n"
+      "اختر من القائمة أدناه للوصول إلى المواقع، الكتب، وشروحات المكونات مباشرة عبر الأزرار التفاعلية:"
   )
 
-  bot.reply_to(message, welcome_text, reply_markup=markup)
+  bot.reply_to(message, welcome_text, reply_markup=markup, parse_mode="Markdown")
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_listener(call):
+  bot.answer_callback_query(call.id)
+
   if call.data == "simulation":
-    bot.answer_callback_query(call.id)
+    sim_markup = types.InlineKeyboardMarkup(row_width=1)
+    sim_markup.add(
+        types.InlineKeyboardButton(
+            "⚡ EasyEDA (تصميم PCB ومحاكاة)", url="https://easyeda.com"
+        ),
+        types.InlineKeyboardButton(
+            "🔌 Falstad Circuit Simulator",
+            url="https://www.falstad.com/circuit/",
+        ),
+        types.InlineKeyboardButton(
+            "💻 EDA Playground (VHDL / Verilog)",
+            url="https://www.edaplayground.com",
+        ),
+        types.InlineKeyboardButton(
+            "🤖 Wokwi (Arduino & ESP32)", url="https://wokwi.com"
+        ),
+    )
     bot.send_message(
         call.message.chat.id,
-        "🌐 **أبرز مواقع المحاكاة:**\n- EasyEDA\n- EDA Playground\n- Falstad Circuit Simulator",
+        "🌐 *أبرز مواقع المحاكاة والتصميم الإلكتروني:*",
+        reply_markup=sim_markup,
+        parse_mode="Markdown",
     )
+
   elif call.data == "books":
-    bot.answer_callback_query(call.id)
+    books_markup = types.InlineKeyboardMarkup(row_width=1)
+    books_markup.add(
+        types.InlineKeyboardButton(
+            "📖 Boylestad - Electronic Devices",
+            url="https://www.google.com/search?q=Boylestad+Electronic+Devices+pdf",
+        ),
+        types.InlineKeyboardButton(
+            "📘 Sedra & Smith - Microelectronic Circuits",
+            url="https://www.google.com/search?q=Sedra+Smith+Microelectronic+Circuits+pdf",
+        ),
+        types.InlineKeyboardButton(
+            "📗 Free Range VHDL (Free Textbook)",
+            url="http://www.freerangevhdl.org/",
+        ),
+    )
     bot.send_message(
         call.message.chat.id,
-        "📚 **قسم المراجع:**\nستجد هنا الكتب المعتمدة والحلول.",
+        "📚 *المراجع والكتب الدراسية المعتمدة:*",
+        reply_markup=books_markup,
+        parse_mode="Markdown",
     )
+
   elif call.data == "components":
-    bot.answer_callback_query(call.id)
+    comp_markup = types.InlineKeyboardMarkup(row_width=1)
+    comp_markup.add(
+        types.InlineKeyboardButton(
+            "⚡ BJT & MOSFET Transistors",
+            url="https://www.electronics-tutorials.ws/transistor/tran_1.html",
+        ),
+        types.InlineKeyboardButton(
+            "📈 Operational Amplifiers (Op-Amps)",
+            url="https://www.electronics-tutorials.ws/opamp/opamp_1.html",
+        ),
+        types.InlineKeyboardButton(
+            "🔋 Linear Voltage Regulators",
+            url="https://www.electronics-tutorials.ws/diode/diode_7.html",
+        ),
+    )
     bot.send_message(
         call.message.chat.id,
-        "🔧 **شروحات المكونات:**\n- Transistors (BJT / MOSFET)\n- Operational Amplifiers\n- Voltage Regulators",
+        "🔧 *شروحات المكونات الإلكترونية الأساسية:*",
+        reply_markup=comp_markup,
+        parse_mode="Markdown",
     )
+
   elif call.data == "control":
-    bot.answer_callback_query(call.id)
+    ctrl_markup = types.InlineKeyboardMarkup(row_width=1)
+    ctrl_markup.add(
+        types.InlineKeyboardButton(
+            "📊 Block Diagrams & Signal Flow",
+            url="https://www.tutorialspoint.com/control_systems/control_systems_block_diagram_reduction.htm",
+        ),
+        types.InlineKeyboardButton(
+            "🔄 Transfer Functions & Laplace",
+            url="https://www.tutorialspoint.com/control_systems/control_systems_laplace_transform.htm",
+        ),
+        types.InlineKeyboardButton(
+            "⚖️ Routh-Hurwitz Stability Criterion",
+            url="https://www.tutorialspoint.com/control_systems/control_systems_routh_hurwitz_stability.htm",
+        ),
+    )
     bot.send_message(
         call.message.chat.id,
-        "⚙️ **أنظمة التحكم:**\nشروحات الـ Block Diagrams وحسابات Transfer Functions و Routh-Hurwitz Criterion.",
+        "⚙️ *شروحات ومواضيع أنظمة التحكم (Control Systems):*",
+        reply_markup=ctrl_markup,
+        parse_mode="Markdown",
     )
 
 
-# 4. تشغيل الخادم والبوت
+# ------------------ 5. التشغيل النهائي ------------------
 if __name__ == "__main__":
   keep_alive()
-  bot.infinity_polling(non_stop=True)
-
+  print("Bot is running...")
+  bot.infinity_polling()
