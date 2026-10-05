@@ -1,15 +1,10 @@
-
-
-
-
-
 import os
 import telebot
 from threading import Thread
 from flask import Flask
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# ------------------ 1. خادم Flask لإبقاء البوت نشطاً (Render / Termux) ------------------
+# ------------------ 1. خادم Flask لإبقاء البوت نشطاً ------------------
 app = Flask("")
 
 @app.route("/")
@@ -25,12 +20,10 @@ def keep_alive():
     t.start()
 
 # ------------------ 2. إعداد التوكن البوت ------------------
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "ضع_التوكن_الخاص_بك_هنا")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # ------------------ 3. بناء القوائم ------------------
-
-# القائمة الرئيسية
 def main_menu():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
@@ -41,7 +34,6 @@ def main_menu():
     )
     return markup
 
-# القوائم الفرعية
 def menu_cat1():
     markup = InlineKeyboardMarkup(row_width=1)
     markup.add(
@@ -104,24 +96,18 @@ def send_welcome(message):
 # ------------------ 5. معالج التفاعل مع الأزرار ------------------
 @bot.callback_query_handler(func=lambda call: True)
 def callback_listener(call):
-    # إعلام تليجرام باستلام الضغطة لإيقاف أيقونة التحميل على الزر
     bot.answer_callback_query(call.id)
-    
     chat_id = call.message.chat.id
     message_id = call.message.message_id
 
     if call.data == "cat1":
         bot.edit_message_text("📘 **قسم أساسيات الإلكترونيات:**\nاختر أحد المصادر التالية:", chat_id, message_id, reply_markup=menu_cat1(), parse_mode="Markdown")
-    
     elif call.data == "cat2":
         bot.edit_message_text("🚀 **قسم المحاكاة والتجربة:**\nاختر منصة المحاكاة للبدء:", chat_id, message_id, reply_markup=menu_cat2(), parse_mode="Markdown")
-    
     elif call.data == "cat3":
         bot.edit_message_text("🖥️ **برامج وتصنيع الـ PCB:**\nأبرز الأدوات والشركات:", chat_id, message_id, reply_markup=menu_cat3(), parse_mode="Markdown")
-    
     elif call.data == "cat4":
         bot.edit_message_text("🔍 **المراجع والداتا شيت:**\nالمكتبات والمواقع المعتمدة:", chat_id, message_id, reply_markup=menu_cat4(), parse_mode="Markdown")
-    
     elif call.data == "back_to_main":
         bot.edit_message_text("⚡ **القائمة الرئيسية:**\nاختر أحد الأقسام للبدء:", chat_id, message_id, reply_markup=main_menu(), parse_mode="Markdown")
 
